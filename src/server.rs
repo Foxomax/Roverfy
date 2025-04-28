@@ -2,8 +2,11 @@ use std::{
     io::{prelude::*, BufReader},
     net::{TcpListener, TcpStream},
 };
+use std::collections::HashMap;
+use crate::http::request::Request;
+use crate::template::render;
+use std::env;
 
-use crate::request::Request;
 
 pub struct Server {
     pub host: String,
@@ -31,6 +34,12 @@ impl Server {
             }
         }
     }
+
+    pub fn stop(&self) {
+        println!("Server stopped");
+
+    }
+
     fn handle_client(&self, mut stream: TcpStream) -> Result<(), std::io::Error> {
         let mut reader = BufReader::new(stream.try_clone()?);
         let mut buffer = String::new();
@@ -47,9 +56,17 @@ impl Server {
         let request = Request::new(&buffer);
         println!("Request: {:?}", request);
 
-        let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", buffer);
-        stream.write_all(response.as_bytes())?;
+        let ruta = env::current_dir().unwrap();
+        println!("RootPath: {:?}", ruta);
+
+        let response: Vec<u8> = render("test/index.html".to_string(), &HashMap::default())?;
+        stream.write_all(&response)?;
 
         Ok(())
+    }
+
+    pub fn restart(&self) {
+        println!("Server restarted");
+        self.start();
     }
 }
