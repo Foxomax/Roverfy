@@ -56,10 +56,13 @@ impl Server {
         let request = Request::new(&buffer);
         println!("Request: {:?}", request);
 
-        let ruta = env::current_dir().unwrap();
+        let ruta = env::current_dir()?;
         println!("RootPath: {:?}", ruta);
 
-        let response: Vec<u8> = render("test/index.html".to_string(), &HashMap::default())?;
+        let mut context = HashMap::new();
+        context.insert("hola".to_string(), "Mundo".to_string());
+
+        let response: Vec<u8> = render("test/index.html".to_string(), &context)?;
         stream.write_all(&response)?;
 
         Ok(())

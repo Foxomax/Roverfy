@@ -14,7 +14,7 @@ pub fn render(
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
 
-    for (key, value) in context {
+    for (key, value) in context.iter() {
         contents = contents.replace(&format!("{{{{ {} }}}}", key), value);
     }
 
