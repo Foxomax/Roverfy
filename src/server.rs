@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use crate::http::request::Request;
 use crate::template::render;
 use std::env;
-
+use tera::Error;
 
 pub struct Server {
     pub host: String,
@@ -21,6 +21,7 @@ impl Server {
     pub fn start(&self) {
         let listener = TcpListener::bind(format!("{}:{}", self.host, self.port)).unwrap();
         println!("Server listening on {}:{}", self.host, self.port);
+        println!("You can stop the server with Ctrl+C");
 
         for stream in listener.incoming() {
             println!("Incoming connection");
@@ -62,7 +63,14 @@ impl Server {
         let mut context = HashMap::new();
         context.insert("hola".to_string(), "Mundo".to_string());
 
-        let response: Vec<u8> = render("test/index.html".to_string(), &context)?;
+        let response: Result<Vec<u8>, Error> = render("test/index.html".to_string(), &context);
+        let response = match response {
+            Ok(res) => res,
+            Err(e) => {
+                eprintln!("Error rendering template: {}", e);
+                return Err(std::io::Error::new(std::io::ErrorKind::Other, "Template rendering error"));
+            }
+        };
         stream.write_all(&response)?;
 
         Ok(())

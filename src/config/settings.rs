@@ -1,8 +1,9 @@
+use std::fmt::format;
 use once_cell::sync::OnceCell;
 use std::sync::Mutex;
 
 pub trait Settings {
-    fn get_template_path(&self) -> &String;
+    fn get_templates_path(&self) -> String;
     fn get_static_path(&self) -> &String;
 }
 
@@ -10,6 +11,7 @@ pub trait Settings {
 pub struct BaseSettings {
     pub templates_path: String,
     pub static_path: String,
+    pub base_path: String,
 }
 
 static GLOBAL_CONFIG: OnceCell<Mutex<BaseSettings>> = OnceCell::new();
@@ -18,7 +20,11 @@ impl BaseSettings {
     pub fn default() -> Self {
         Self {
             templates_path: "templates".to_string(),
-            static_path: "static/".to_string(),
+            static_path: "static".to_string(),
+            base_path: std::env::current_dir()
+                .expect("Failed to get current directory")
+                .to_string_lossy()
+                .to_string(),
         }
     }
 
@@ -30,8 +36,8 @@ impl BaseSettings {
 }
 
 impl Settings for BaseSettings {
-    fn get_template_path(&self) -> &String {
-        &self.templates_path
+    fn get_templates_path(&self) -> String {
+        format!("{}/{}", self.base_path, self.templates_path)
     }
 
     fn get_static_path(&self) -> &String {
