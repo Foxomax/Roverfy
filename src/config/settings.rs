@@ -17,7 +17,7 @@ static GLOBAL_CONFIG: OnceCell<Mutex<BaseSettings>> = OnceCell::new();
 impl BaseSettings {
     pub fn default() -> Self {
         Self {
-            templates_path: "templates/".to_string(),
+            templates_path: "templates".to_string(),
             static_path: "static/".to_string(),
         }
     }
