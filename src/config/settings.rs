@@ -1,41 +1,48 @@
-use std::env;
-use std::path::PathBuf;
+use once_cell::sync::OnceCell;
+use std::sync::Mutex;
 
 pub trait Settings {
-    fn get_template_path(&self) -> &PathBuf;
-    fn get_static_path(&self) -> &PathBuf;
+    fn get_template_path(&self) -> &String;
+    fn get_static_path(&self) -> &String;
 }
 
+#[derive(Debug)]
 pub struct BaseSettings {
-    pub template_path: PathBuf,
-    pub static_path:   PathBuf,
+    pub templates_path: String,
+    pub static_path: String,
 }
+
+static GLOBAL_CONFIG: OnceCell<Mutex<BaseSettings>> = OnceCell::new();
 
 impl BaseSettings {
-    pub fn new() -> Self {
-        let default_tpl = PathBuf::from("./templates");
-        let default_sta = PathBuf::from("./static");
+    pub fn default() -> Self {
+        Self {
+            templates_path: "templates/".to_string(),
+            static_path: "static/".to_string(),
+        }
+    }
 
-        let template_path = env::var_os("TEMPLATE_PATH")
-            .map(PathBuf::from)
-            .unwrap_or(default_tpl);
-
-        let static_path = env::var_os("STATIC_PATH")
-            .map(PathBuf::from)
-            .unwrap_or(default_sta);
-
-        BaseSettings { template_path, static_path }
+    pub fn init_config(self) {
+        GLOBAL_CONFIG
+            .set(Mutex::new(self))
+            .expect("Failed to initialize global config");
     }
 }
 
 impl Settings for BaseSettings {
-    fn get_template_path(&self) -> &PathBuf {
-        &self.template_path
+    fn get_template_path(&self) -> &String {
+        &self.templates_path
     }
 
-    fn get_static_path(&self) -> &PathBuf {
+    fn get_static_path(&self) -> &String {
         &self.static_path
     }
 }
 
-
+pub fn get_config() -> std::sync::MutexGuard<'static, BaseSettings> {
+    GLOBAL_CONFIG
+        .get()
+        .expect("Global config not initialized")
+        .lock()
+        .expect("Failed to lock global config")
+}

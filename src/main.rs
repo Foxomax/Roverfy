@@ -1,10 +1,9 @@
-mod server;
-mod http;
-mod template;
-mod config;
-
+use std::env;
+use roverfy::Roverfy;
+use roverfy::BaseSettings;
 
 fn main() {
-    let server = server::Server::new("127.0.0.1".to_string(), 7878);
-    server.start();
+    let args: Vec<String> = env::args().collect();
+    let settings = BaseSettings::default();
+    Roverfy::new(args, settings);
 }

@@ -1,27 +1,31 @@
 use crate::http::response::{ResponseBuilder, HttpResponseBuilder};
 use crate::http::StatusCode;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
-use crate::config::{BaseSettings, Settings};
+use crate::config::{get_config, Settings};
+use crate::http::contenttypes::ContentType;
+use crate::template::tera_renderer::{TeraRenderer};
+use tera::Context;
 
 pub fn render(
     template_path: String,
     context: &HashMap<String, String>,
 ) -> Result<Vec<u8>, std::io::Error> {
-    let template_path = BaseSettings::new().get_template_path().join(template_path);
-    let mut file = File::open(template_path)?;
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-
-    for (key, value) in context.iter() {
-        contents = contents.replace(&format!("{{{{ {} }}}}", key), value);
-    }
+    let ct = ContentType::Html;
+    let context = Context::from_serialize(context)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+    let config = get_config();
+    let render = TeraRenderer::new(
+        format!("{}/{}", config.get_template_path(), template_path),
+        context.clone(),
+    );
+    let output = render
+        .render()
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
     let response = HttpResponseBuilder.build(
         StatusCode::OK,
-        vec![("Content-Type".to_string(), "text/html".to_string())],
-        contents,
+        vec![("Content-Type".to_string(), ct.as_str().to_string())],
+        output,
     );
 
     Ok(response)
