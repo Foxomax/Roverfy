@@ -17,8 +17,8 @@ impl Server {
         Self { host, port }
     }
 
-    pub fn start(&self) {
-        let listener = TcpListener::bind(format!("{}:{}", self.host, self.port)).unwrap();
+    pub fn start(&self) -> Result<(), std::io::Error> {
+        let listener = TcpListener::bind(format!("{}:{}", self.host, self.port))?;
         println!("Server listening on {}:{}", self.host, self.port);
         println!("You can stop the server with Ctrl+C");
 
