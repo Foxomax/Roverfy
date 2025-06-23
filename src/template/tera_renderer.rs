@@ -1,6 +1,6 @@
 use once_cell::sync::Lazy;
 use tera::{Tera, Context};
-use crate::config::{get_config, Settings};
+use crate::config::get_config;
 
 pub struct TemplateEngine {
     tera: Tera,

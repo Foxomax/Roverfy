@@ -1,4 +1,3 @@
-use roverfy::server::Server;
 use roverfy::{BaseSettings, Roverfy};
 use std::net::TcpStream;
 use std::thread;
@@ -12,7 +11,7 @@ fn test_server_starts_and_accepts_connection() {
     let app = Roverfy::new(vec!["test".to_string(), "serve".to_string()], settings);
 
     // Step 2: Run the server in a separate thread so it doesn't block the test.
-    let server_handle = thread::spawn(move || {
+    let _server_handle = thread::spawn(move || {
         if let Err(e) = app.run() {
             panic!("Server failed to run: {}", e);
         }

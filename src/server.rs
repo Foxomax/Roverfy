@@ -5,7 +5,6 @@ use std::{
 use std::collections::HashMap;
 use crate::http::request::Request;
 use crate::template::render;
-use std::env;
 use tera::Error;
 
 pub struct Server {
@@ -54,7 +53,7 @@ impl Server {
             buffer.push_str(&String::from_utf8_lossy(&temp_buffer[..bytes_read]));
         }
 
-        let request = Request::new(&buffer);
+        let _request = Request::new(&buffer);
 
         let mut context = HashMap::new();
         context.insert("hola".to_string(), "Mundo".to_string());
