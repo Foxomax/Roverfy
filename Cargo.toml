@@ -16,3 +16,4 @@ include = ["/src/**/*", "/README.md"]
 serde_json = "1.0.140"
 tera = "1.20.0"
 once_cell = "1.21.3"
+urlencoding = "2.1.3"

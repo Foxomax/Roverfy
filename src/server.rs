@@ -55,10 +55,6 @@ impl Server {
         }
 
         let request = Request::new(&buffer);
-        println!("Request: {:?}", request);
-
-        let ruta = env::current_dir()?;
-        println!("RootPath: {:?}", ruta);
 
         let mut context = HashMap::new();
         context.insert("hola".to_string(), "Mundo".to_string());

@@ -1,8 +1,9 @@
-mod server;
-mod http;
-mod config;
-mod template;
+pub mod server;
+pub mod http;
+pub mod template;
+pub mod config;
 mod router;
+mod errors;
 
 pub enum Command {
     RunServer,
@@ -18,7 +19,7 @@ pub struct Roverfy {
 
 
 // Library exports.
-pub use crate::config::BaseSettings;
+pub use crate::config::{BaseSettings, Settings};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -29,8 +30,18 @@ trait CLI {
 }
 
 impl Roverfy {
-    pub fn new(args: Vec<String>, settings: BaseSettings) -> Self {
-        settings.init_config();
+    /// Creates a new Roverfy application instance.
+    ///
+    /// This function is generic and accepts any settings configuration that
+    /// implements the `Settings` trait. It also initializes the global
+    /// configuration for the application.
+    ///
+    /// # Arguments
+    ///
+    /// * `args` - The command-line arguments.
+    /// * `settings` - An instance of a struct that implements `Settings`.
+    pub fn new<S: Settings>(args: Vec<String>, settings: S) -> Self {
+        config::init_config(settings);
         Roverfy { args }
     }
 
