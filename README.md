@@ -91,4 +91,4 @@ We'd love for you to contribute to Roverfy! If you have ideas for new features, 
 Please follow the coding standards and ensure all tests pass before submitting a pull request.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU License. See the [LICENSE](LICENSE) file for details.
