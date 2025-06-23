@@ -17,13 +17,12 @@ impl Server {
         Self { host, port }
     }
 
-    pub fn start(&self) -> Result<(), std::io::Error> {
-        let listener = TcpListener::bind(format!("{}:{}", self.host, self.port))?;
+    pub fn start(&self) {
+        let listener = TcpListener::bind(format!("{}:{}", self.host, self.port)).unwrap();
         println!("Server listening on {}:{}", self.host, self.port);
         println!("You can stop the server with Ctrl+C");
 
         for stream in listener.incoming() {
-            println!("Incoming connection");
             match stream {
                 Ok(stream) => {
                     self.handle_client(stream).expect("TODO: panic message");
@@ -37,7 +36,6 @@ impl Server {
 
     pub fn stop(&self) {
         println!("Server stopped");
-
     }
 
     fn handle_client(&self, mut stream: TcpStream) -> Result<(), std::io::Error> {
