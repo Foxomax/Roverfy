@@ -1,7 +1,5 @@
-use std::{
-    io::{prelude::*, BufReader},
-    net::{TcpListener, TcpStream},
-};
+use tokio::io::{AsyncReadExt, AsyncWriteExt, BufReader};
+use tokio::net::{TcpListener, TcpStream};
 use std::collections::HashMap;
 use crate::http::request::Request;
 use crate::template::render;
@@ -17,20 +15,13 @@ impl Server {
         Self { host, port }
     }
 
-    pub fn start(&self) {
-        let listener = TcpListener::bind(format!("{}:{}", self.host, self.port)).unwrap();
-        println!("Server listening on {}:{}", self.host, self.port);
-        println!("You can stop the server with Ctrl+C");
-
-        for stream in listener.incoming() {
-            match stream {
-                Ok(stream) => {
-                    self.handle_client(stream).expect("TODO: panic message");
-                }
-                Err(e) => {
-                    eprintln!("Error accepting connection: {}", e);
-                }
-            }
+    pub async fn start(&self) {
+        let listener = TcpListener::bind(format!("{}:{}", self.host, self.port)).await.unwrap();
+        loop {
+            let (socket, _) = listener.accept().await.unwrap();
+            tokio::spawn(async move {
+                Server::process(socket).await.expect("Failed to process connection");
+            });
         }
     }
 
@@ -38,13 +29,13 @@ impl Server {
         println!("Server stopped");
     }
 
-    fn handle_client(&self, mut stream: TcpStream) -> Result<(), std::io::Error> {
-        let mut reader = BufReader::new(stream.try_clone()?);
+    async fn process(mut socket: TcpStream) -> Result<(), std::io::Error> {
+        let mut reader = BufReader::new(&mut socket);
         let mut buffer = String::new();
 
         while !buffer.contains("\r\n\r\n") {
             let mut temp_buffer = [0; 512];
-            let bytes_read = reader.read(&mut temp_buffer)?;
+            let bytes_read = reader.read(&mut temp_buffer).await?;
             if bytes_read == 0 {
                 break;
             }
@@ -64,13 +55,13 @@ impl Server {
                 return Err(std::io::Error::new(std::io::ErrorKind::Other, "Template rendering error"));
             }
         };
-        stream.write_all(&response)?;
+        socket.write_all(&response).await?;
 
         Ok(())
     }
 
-    pub fn restart(&self) {
+    pub async fn restart(&self) {
         println!("Server restarted");
-        self.start();
+        self.start().await;
     }
 }

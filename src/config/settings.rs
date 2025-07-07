@@ -18,6 +18,7 @@ pub struct BaseSettings {
     pub templates_path: String,
     pub static_path: String,
     pub base_path: String,
+    pub url_config: Option<String>,
 }
 
 // The global configuration, storing a boxed trait object to allow for different
@@ -54,6 +55,7 @@ impl BaseSettings {
             templates_path: "templates".to_string(),
             static_path: "static".to_string(),
             base_path: find_project_root().to_string_lossy().to_string(),
+            url_config: None,
         }
     }
     

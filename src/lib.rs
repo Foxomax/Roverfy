@@ -20,6 +20,7 @@ pub struct Roverfy {
 
 // Library exports.
 pub use crate::config::{BaseSettings, Settings};
+pub use crate::router::{path, PathRouter};
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 

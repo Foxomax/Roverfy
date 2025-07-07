@@ -2,7 +2,8 @@ use std::env;
 use roverfy::Roverfy;
 use roverfy::BaseSettings;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args: Vec<String> = env::args().collect();
     let settings = BaseSettings::default();
     let app = Roverfy::new(args, settings);
