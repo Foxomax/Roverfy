@@ -1,7 +1,6 @@
 use std::fmt;
 use std::str::FromStr;
 use crate::errors::ContentTypeParseError;
-
 /// Represents HTTP content types (MIME types) commonly used in web applications.
 /// 
 /// This enum provides a type-safe way to handle content types and their string representations.
